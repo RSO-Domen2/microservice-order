@@ -1,0 +1,2 @@
+INSERT INTO order_metadata (clientId, restaurantId, menuId, created) VALUES (1, 0, 0, TIMESTAMP '2001-01-01T12:00:00Z');
+INSERT INTO order_metadata (clientId, restaurantId, menuId, created) VALUES (2, 0, 1, TIMESTAMP '2001-01-02T12:00:00Z');

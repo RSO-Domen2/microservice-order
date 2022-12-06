@@ -1,0 +1,36 @@
+kumuluzee:
+  name: order-service
+  env:
+    name: dev
+  version: 1.0.0
+  server:
+    base-url: http://localhost:8083
+    http:
+      port: 8083
+  datasources:
+    - jndi-name: jdbc/OrderMetadataDS
+      connection-url: jdbc:postgresql://localhost:5432/order-metadata
+      username: dbuser
+      password: postgres
+      pool:
+        max-size: 1
+  health:
+    servlet:
+      mapping: /health
+      enabled: true
+    checks:
+      data-source-health-check:
+        type: both
+        jndi-name: jdbc/OrderMetadataDS
+      disk-space-health-check:
+        type: both
+        threshold: 10000000 # 10MB
+
+rest-properties:
+  maintenance-mode: false
+  broken: false
+
+app-properties:
+  external-services:
+    radar-url: https://api.radar.io
+    secret: 

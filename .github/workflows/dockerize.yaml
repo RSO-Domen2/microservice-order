@@ -37,4 +37,4 @@ jobs:
         with:
           file: ./Dockerfile_with_maven_build
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/microservice-deliveryman:${{ steps.version.outputs.info }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/microservice-order:${{ steps.version.outputs.info }}

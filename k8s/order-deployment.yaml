@@ -1,0 +1,73 @@
+# define a pod
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - image: dmohorcic/microservice-order:1.0.0-SNAPSHOT
+          name: order
+          env:
+              # from api/resources/config.yaml
+              # kumuluzee -> datasources -> 0th element -> connection-url
+            - name: KUMULUZEE_ENV_NAME
+              value: prod
+            - name: KUMULUZEE_DATASOURCES0_CONNECTIONURL
+              value: jdbc:postgresql://abul.db.elephantsql.com:5432/yzegmjxf
+            - name: KUMULUZEE_DATASOURCES0_USERNAME
+              value: yzegmjxf
+            - name: KUMULUZEE_DATASOURCES0_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: order-elephantsql
+                  key: password
+            - name: EXTERNALSERVICES_RADAR_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: radar
+                  key: password
+          ports:
+            - containerPort: 8080
+              name: order-server
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: order-server
+            initialDelaySeconds: 20
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: order-server
+            initialDelaySeconds: 20
+            periodSeconds: 3
+
+---
+
+# define connection to pod
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service # can be random
+spec:
+  # ClusterIP for ms that call each other -> available only within cluster
+  # LoadBalancer for public IP
+  # LoadPort
+  type: LoadBalancer
+  ports:
+      # this is outside port, we map server:port (server is in Deployment)
+    - port: 8080
+      protocol: TCP
+      targetPort: order-server
+  selector:
+    app: order # select pod

@@ -5,17 +5,27 @@ import javax.enterprise.context.ApplicationScoped;
 import com.kumuluz.ee.configuration.cdi.ConfigBundle;
 import com.kumuluz.ee.configuration.cdi.ConfigValue;
 
-@ConfigBundle("app-properties")
+@ConfigBundle("external-services")
 @ApplicationScoped
 public class ApiProperties {
 
-    @ConfigValue(value = "external-services.radar-url", watch = true)
-    private Boolean radarUrl;
+    @ConfigValue(value = "radar.url")
+    private String radarUrl;
 
-    public Boolean getRadarUrl() {
+    @ConfigValue(value = "radar.secret", watch = true)
+    private String secret;
+
+    public String getRadarUrl() {
         return radarUrl;
     }
-    public void setRadarUrl(Boolean routingUrl) {
-        this.radarUrl = routingUrl;
+    public void setRadarUrl(String radarUrl) {
+        this.radarUrl = radarUrl;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+    public void setSecret(String secret) {
+        this.secret = secret;
     }
 }

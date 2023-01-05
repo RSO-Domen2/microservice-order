@@ -4,9 +4,9 @@ kumuluzee:
     name: dev
   version: 1.0.0
   server:
-    base-url: http://localhost:8083
+    base-url: http://localhost:8080
     http:
-      port: 8083
+      port: 8080
   datasources:
     - jndi-name: jdbc/OrderMetadataDS
       connection-url: jdbc:postgresql://localhost:5432/order-metadata
@@ -25,12 +25,17 @@ kumuluzee:
       disk-space-health-check:
         type: both
         threshold: 10000000 # 10MB
+  dev:
+    scan-libraries:
+      - order-services
+      - order-models
+      - order-lib
 
 rest-properties:
   maintenance-mode: false
   broken: false
 
-app-properties:
-  external-services:
-    radar-url: https://api.radar.io
-    secret: 
+external-services:
+  radar:
+    url: https://api.radar.io
+    secret: prj_test_pk_0f864f625ddff3adb7949f7a2a8c9f2a3a001c72

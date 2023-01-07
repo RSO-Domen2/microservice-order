@@ -11,7 +11,9 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import org.eclipse.microprofile.faulttolerance.ExecutionContext;
 import org.eclipse.microprofile.faulttolerance.Fallback;
+import org.eclipse.microprofile.faulttolerance.FallbackHandler;
 import org.eclipse.microprofile.faulttolerance.Timeout;
 
 import si.fri.rso.domen2.order.lib.RadarResponseDistance;
@@ -21,6 +23,7 @@ import si.fri.rso.domen2.order.lib.RadarShema.RadarResponseRoutes;
 import si.fri.rso.domen2.order.lib.RadarShema.RadarResponseTransport;
 import si.fri.rso.domen2.order.lib.RadarShema.RadarResponseValue;
 import si.fri.rso.domen2.order.services.config.ApiProperties;
+import si.fri.rso.domen2.order.services.clients.fallbacks.RadarDistanceFallback;
 
 /* 
  * Client for Radar API
@@ -43,15 +46,21 @@ public class RadarClient {
 
     @Timeout(value = 2000, unit = ChronoUnit.MILLIS)
     //@Fallback(fallbackMethod = "fallbackGetDistance")
+    //@Fallback(RadarDistanceFallback.class)
     public RadarResponseDistance getDistance(Double start_lat, Double start_lng, Double end_lat, Double end_lng) {
+        return this.callRadarDistance(start_lat, start_lng, end_lat, end_lng);
+    }
+
+    private RadarResponseDistance callRadarDistance(Double start_lat, Double start_lng, Double end_lat, Double end_lng) {
         Response response = httpClient.target(ap.getRadarUrl() + "/v1/route/distance")
             .queryParam("origin", start_lat+","+start_lng)
             .queryParam("destination", end_lat+","+end_lng)
             .queryParam("modes", "car,bike,foot")
             .queryParam("units", "metric")
             .request()
-            .header("Authorization", ap.getSecret())
+            .header("Authorization", ap.getRadarSecret())
             .get();
+        this.LOG.info("GET "+ap.getRadarUrl()+"/v1/route/distance "+Integer.toString(response.getStatus()));
         if(response.getStatus() == 200) {
             return response.readEntity(RadarResponseDistance.class);
         }
@@ -62,7 +71,7 @@ public class RadarClient {
 
     /* Calculates Geodesic distance */
     public RadarResponseDistance fallbackGetDistance(Double start_lat, Double start_lng, Double end_lat, Double end_lng) {
-        this.LOG.warning("Fallback getDistanceFallback was used");
+        this.LOG.warning("Fallback for getDistance was used");
         double dLat = Math.toRadians(end_lat - start_lat);
         double dLng = Math.toRadians(end_lng - start_lng);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -79,15 +88,15 @@ public class RadarClient {
                 ),
                 new RadarResponseTransport( //car
                     new RadarResponseValue(distance, ""),
-                    new RadarResponseValue(distance, "")
+                    new RadarResponseValue(distance / 833, "") // 50 km/h -> 833 m/min
                 ),
                 new RadarResponseTransport( //bike
                     new RadarResponseValue(distance, ""),
-                    new RadarResponseValue(distance, "")
+                    new RadarResponseValue(distance / 333, "") // 20 km/h -> 333 m/min
                 ),
                 new RadarResponseTransport( //foot
                     new RadarResponseValue(distance, ""),
-                    new RadarResponseValue(distance, "")
+                    new RadarResponseValue(distance / 100, "") // 6 km/h -> 100 m/min
                 )
             )
         );

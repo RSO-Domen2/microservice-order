@@ -35,6 +35,9 @@ public class OrderMetadataEntity {
     @Column(name = "deliverymanId")
     private Integer deliverymanId;
 
+    @Column(name = "cost")
+    private Double cost;
+
     @Column(name = "created")
     private Instant created;
 
@@ -71,6 +74,13 @@ public class OrderMetadataEntity {
     }
     public void setDeliverymanId(Integer deliverymanId) {
         this.deliverymanId = deliverymanId;
+    }
+
+    public Double getCost() {
+        return cost;
+    }
+    public void setCost(Double cost) {
+        this.cost = cost;
     }
 
     public Instant getCreated() {

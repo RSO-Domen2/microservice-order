@@ -12,6 +12,7 @@ public class OrderMetadataConverter {
         dto.setRestaurantId(entity.getRestaurantId());
         dto.setMenuId(entity.getMenuId());
         dto.setDeliverymanId(entity.getDeliverymanId());
+        dto.setCost(entity.getCost());
         dto.setCreated(entity.getCreated());
         return dto;
     }
@@ -23,6 +24,7 @@ public class OrderMetadataConverter {
         entity.setRestaurantId(dto.getRestaurantId());
         entity.setMenuId(dto.getMenuId());
         entity.setDeliverymanId(dto.getDeliverymanId());
+        entity.setCost(dto.getCost());
         entity.setCreated(dto.getCreated());
         return entity;
     }

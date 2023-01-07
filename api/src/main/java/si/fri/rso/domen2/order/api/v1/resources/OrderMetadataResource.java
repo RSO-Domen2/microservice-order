@@ -1,6 +1,7 @@
 package si.fri.rso.domen2.order.api.v1.resources;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -17,6 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
@@ -29,9 +32,13 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import com.kumuluz.ee.logs.cdi.Log;
+
 import si.fri.rso.domen2.order.lib.OrderMetadata;
 import si.fri.rso.domen2.order.services.beans.OrderMetadataBean;
+import si.fri.rso.domen2.order.services.routing.Optimize;
 
+@Log
 @ApplicationScoped
 @Tag(name = "Order Metadata", description = "Get, add, and edit the order metadata.")
 @Path("/orders")
@@ -42,7 +49,10 @@ public class OrderMetadataResource {
     private final Logger LOG = Logger.getLogger(OrderMetadataResource.class.getName());
 
     @Inject
-    private OrderMetadataBean dmb;
+    private OrderMetadataBean omb;
+
+    @Inject
+    private Optimize opti;
 
     @Context
     protected UriInfo uriInfo;
@@ -57,11 +67,11 @@ public class OrderMetadataResource {
         )})
     @GET
     public Response getOrderMetadata() {
-        LOG.info(uriInfo.getRequestUri().getQuery());
-        List<OrderMetadata> listDm = dmb.getOrderMetadataFilter(uriInfo);
+        this.LOG.info("GET "+uriInfo.getRequestUri().toString());
+        List<OrderMetadata> listOm = omb.getOrderMetadataFilter(uriInfo);
         return Response.status(Response.Status.OK)
-            .header("X-Total-Count", listDm.size())
-            .entity(listDm).build();
+            .header("X-Total-Count", listOm.size())
+            .entity(listOm).build();
     }
 
 
@@ -78,15 +88,16 @@ public class OrderMetadataResource {
         @Parameter(description = "Order metadata ID.", required = true)
         @PathParam("orderId") Integer orderId) {
         
-        OrderMetadata dm = dmb.getOrderMetadata(orderId);
-        if(dm == null) {
+        this.LOG.info("GET "+uriInfo.getRequestUri().toString());
+        OrderMetadata om = omb.getOrderMetadata(orderId);
+        if(om == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.OK).entity(dm).build();
+        return Response.status(Response.Status.OK).entity(om).build();
     }
 
 
-    @Operation(description = "Add Order metadata.", summary = "Add metadata")
+    /* @Operation(description = "Add Order metadata.", summary = "Add metadata")
     @APIResponses({
         @APIResponse(responseCode = "201",
             description = "Metadata successfully added.",
@@ -98,13 +109,47 @@ public class OrderMetadataResource {
         @RequestBody(description = "DTO object with Order metadata.",
             required = true,
             content = @Content(schema = @Schema(implementation = OrderMetadata.class)))
-            OrderMetadata dm) {
-
-        dm = dmb.createOrderMetadata(dm);
-        if(dm == null) {
+            OrderMetadata om) {
+        
+        this.LOG.info("POST "+uriInfo.getRequestUri().toString());
+        om = omb.createOrderMetadata(om);
+        if(om == null) {
             return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
-        return Response.status(Response.Status.CREATED).entity(dm).build();
+        return Response.status(Response.Status.CREATED).entity(om).build();
+    } */
+
+    
+    @Operation(description = "Add Order metadata.", summary = "Add metadata")
+    @APIResponses({
+        @APIResponse(responseCode = "201",
+            description = "Metadata successfully added.",
+            content = @Content(schema = @Schema(implementation = OrderMetadata.class))),
+        @APIResponse(responseCode = "406", description = "Validation error."),
+        @APIResponse(responseCode = "503", description = "Time out.")
+    })
+    @POST
+    public void asyncCreateOrderMetadata(
+        @RequestBody(description = "DTO object with Order metadata.",
+        required = true,
+        content = @Content(schema = @Schema(implementation = OrderMetadata.class)))
+        OrderMetadata om,
+        @Suspended final AsyncResponse asyncResponse
+    ) {
+        this.LOG.info("POST ASYNC "+uriInfo.getRequestUri().toString());
+        asyncResponse.setTimeoutHandler(unused -> {
+            this.LOG.warning("POST ASYNC "+uriInfo.getRequestUri().toString()+" TIME OUT");
+            unused.resume(Response.status(Response.Status.SERVICE_UNAVAILABLE).build());
+        });
+        asyncResponse.setTimeout(30, TimeUnit.SECONDS);
+        new Thread(() -> {
+            OrderMetadata updatedOM = opti.calculateBestDeliveryman(om);
+            updatedOM = omb.createOrderMetadata(updatedOM);
+            if(updatedOM == null) {
+                asyncResponse.resume(Response.status(Response.Status.NOT_ACCEPTABLE).build());
+            }
+            asyncResponse.resume(Response.status(Response.Status.CREATED).entity(om).build());
+        }).start();
     }
 
 
@@ -124,14 +169,15 @@ public class OrderMetadataResource {
         @RequestBody(description = "DTO object with Order metadata.",
             required = true,
             content = @Content(schema = @Schema(implementation = OrderMetadata.class)))
-            OrderMetadata dm) {
+            OrderMetadata om
+    ) {
+        this.LOG.info("PUT "+uriInfo.getRequestUri().toString());
 
-        dm = dmb.putOrderMetadata(orderId, dm);
-
-        if(dm == null) {
+        om = omb.putOrderMetadata(orderId, om);
+        if(om == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.OK).entity(dm).build();
+        return Response.status(Response.Status.OK).entity(om).build();
     }
 
 
@@ -146,8 +192,10 @@ public class OrderMetadataResource {
         @Parameter(description = "Metadata ID.", required = true)
         @PathParam("orderId")
             Integer orderId) {
+        
+        this.LOG.info("DELETE "+uriInfo.getRequestUri().toString());
 
-        boolean deleted = dmb.deleteOrderMetadata(orderId);
+        boolean deleted = omb.deleteOrderMetadata(orderId);
 
         if(deleted) {
             return Response.status(Response.Status.NO_CONTENT).build();

@@ -37,18 +37,18 @@ spec:
                   key: password
           ports:
             - containerPort: 8080
-              name: order-server
+              name: server
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /health/live
-              port: order-server
+              port: server
             initialDelaySeconds: 20
             periodSeconds: 3
           readinessProbe:
             httpGet:
               path: /health/ready
-              port: order-server
+              port: server
             initialDelaySeconds: 20
             periodSeconds: 3
 
@@ -63,11 +63,11 @@ spec:
   # ClusterIP for ms that call each other -> available only within cluster
   # LoadBalancer for public IP
   # LoadPort
-  type: LoadBalancer
+  type: ClusterIP
   ports:
       # this is outside port, we map server:port (server is in Deployment)
     - port: 8080
       protocol: TCP
-      targetPort: order-server
+      targetPort: server
   selector:
     app: order # select pod

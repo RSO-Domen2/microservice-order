@@ -13,7 +13,16 @@ public class ApiProperties {
     private String radarUrl;
 
     @ConfigValue(value = "radar.secret", watch = true)
-    private String secret;
+    private String radarSecret;
+
+    @ConfigValue(value = "deliveryman.url")
+    private String deliverymanUrl;
+
+    @ConfigValue(value = "client.url")
+    private String clientUrl;
+    
+    @ConfigValue(value = "restaurant.url")
+    private String restaurantUrl;
 
     public String getRadarUrl() {
         return radarUrl;
@@ -22,10 +31,31 @@ public class ApiProperties {
         this.radarUrl = radarUrl;
     }
 
-    public String getSecret() {
-        return secret;
+    public String getRadarSecret() {
+        return radarSecret;
     }
-    public void setSecret(String secret) {
-        this.secret = secret;
+    public void setRadarSecret(String radarSecret) {
+        this.radarSecret = radarSecret;
+    }
+
+    public String getDeliverymanUrl() {
+        return deliverymanUrl;
+    }
+    public void setDeliverymanUrl(String deliverymanUrl) {
+        this.deliverymanUrl = deliverymanUrl;
+    }
+
+    public String getClientUrl() {
+        return clientUrl;
+    }
+    public void setClientUrl(String clientUrl) {
+        this.clientUrl = clientUrl;
+    }
+
+    public String getRestaurantUrl() {
+        return restaurantUrl;
+    }
+    public void setRestaurantUrl(String restaurantUrl) {
+        this.restaurantUrl = restaurantUrl;
     }
 }

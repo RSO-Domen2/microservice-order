@@ -16,7 +16,6 @@ import si.fri.rso.domen2.order.lib.OrderMetadata;
 import si.fri.rso.domen2.order.models.converters.OrderMetadataConverter;
 import si.fri.rso.domen2.order.models.entities.OrderMetadataEntity;
 
-
 @RequestScoped
 public class OrderMetadataBean {
 
@@ -28,6 +27,7 @@ public class OrderMetadataBean {
 
 
     public List<OrderMetadata> getOrderMetadataFilter(UriInfo uriInfo) {
+        this.LOG.info("Function call getOrderMetadataFilter");
         QueryParameters qp = QueryParameters.query(uriInfo.getRequestUri().getQuery()).defaultOffset(0).build();
         return JPAUtils.queryEntities(em, OrderMetadataEntity.class, qp).stream().map(OrderMetadataConverter::toDto).collect(Collectors.toList());
     }
@@ -36,9 +36,10 @@ public class OrderMetadataBean {
     public OrderMetadata getOrderMetadata(Integer id) {
         OrderMetadataEntity dme = em.find(OrderMetadataEntity.class, id);
         if(dme == null) {
-            // throw new NotFoundException();
+            this.LOG.warning("Function call getOrderMetadata ID "+id.toString()+" FAILED");
             return null;
         }
+        this.LOG.info("Function call getOrderMetadata");
         OrderMetadata dm = OrderMetadataConverter.toDto(dme);
         return dm;
     }
@@ -55,9 +56,10 @@ public class OrderMetadataBean {
         }
 
         if(dme.getId() == null) {
-            //throw new RuntimeException("Entity was not persisted");
+            this.LOG.warning("Function call createOrderMetadata ID FAILED");
             return null;
         }
+        this.LOG.info("Function call createOrderMetadata");
         return OrderMetadataConverter.toDto(dme);
     }
 
@@ -74,8 +76,10 @@ public class OrderMetadataBean {
             updatedDme = em.merge(updatedDme);
             commitTx();
         } catch(Exception e) {
+            this.LOG.warning("Function call putOrderMetadata FAILED");
             rollbackTx();
         }
+        this.LOG.info("Function call putOrderMetadata");
         return OrderMetadataConverter.toDto(updatedDme);
     }
 
@@ -88,8 +92,11 @@ public class OrderMetadataBean {
                 em.remove(dme);
                 commitTx();
             } catch(Exception e) {
+                this.LOG.warning("Function call deleteOrderMetadata FAILED");
                 rollbackTx();
+                return false;
             }
+            this.LOG.info("Function call deleteOrderMetadata");
             return true;
         } else {
             return false;

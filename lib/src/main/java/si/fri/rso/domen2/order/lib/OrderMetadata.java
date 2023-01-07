@@ -9,6 +9,7 @@ public class OrderMetadata {
     private Integer restaurantId;
     private Integer menuId;
     private Integer deliverymanId;
+    private Double cost;
     private Instant created;
 
     public Integer getId() {
@@ -44,6 +45,13 @@ public class OrderMetadata {
     }
     public void setDeliverymanId(Integer deliverymanId) {
         this.deliverymanId = deliverymanId;
+    }
+
+    public Double getCost() {
+        return cost;
+    }
+    public void setCost(Double cost) {
+        this.cost = cost;
     }
 
     public Instant getCreated() {

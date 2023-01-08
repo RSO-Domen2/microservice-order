@@ -2,7 +2,7 @@ kumuluzee:
   name: order-service
   env:
     name: dev
-  version: 1.2.1
+  version: 1.2.2
   server:
     base-url: http://localhost:8080
     http:
@@ -25,13 +25,6 @@ kumuluzee:
       disk-space-health-check:
         type: both
         threshold: 10000000 # 10MB
-      http-health-check:
-        - connection-url: http://20.75.162.98/deliveryman/health
-          type: ready
-        - connection-url: http://20.75.162.98/restaurant/health
-          type: ready
-        - connection-url: http://20.75.162.98/client/health
-          type: ready
   logs:
     config-file: '<?xml version="1.0" encoding="UTF-8"?>
                   <Configuration name="deliveryman-logging">

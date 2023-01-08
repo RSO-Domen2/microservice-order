@@ -6,7 +6,7 @@
 
     <groupId>si.fri.rso.domen2</groupId>
     <artifactId>order</artifactId>
-    <version>1.2.2-SNAPSHOT</version>
+    <version>1.3.0-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 
@@ -31,6 +31,7 @@
         <kumuluzee-logs.version>1.4.6</kumuluzee-logs.version>
         <kumuluzee-fault-tolerance.version>2.1.1</kumuluzee-fault-tolerance.version>
         <kumuluzee-rest-client.version>2.0.0</kumuluzee-rest-client.version>
+        <kumuluzee-cors.version>2.0.0</kumuluzee-cors.version>
 
         <postgresql.version>42.5.1</postgresql.version>
     </properties>
@@ -104,6 +105,12 @@
                 <groupId>com.kumuluz.ee.rest-client</groupId>
                 <artifactId>kumuluzee-rest-client</artifactId>
                 <version>${kumuluzee-rest-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.kumuluz.ee.cors</groupId>
+                <artifactId>kumuluzee-cors</artifactId>
+                <version>${kumuluzee-cors.version}</version>
             </dependency>
 
 

@@ -14,7 +14,7 @@ spec:
         app: order
     spec:
       containers:
-        - image: dmohorcic/microservice-order:1.2.2-SNAPSHOT
+        - image: dmohorcic/microservice-order:1.3.0-SNAPSHOT
           name: order
           env:
               # from api/resources/config.yaml

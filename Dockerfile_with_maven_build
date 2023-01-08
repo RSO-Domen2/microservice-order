@@ -6,6 +6,6 @@ RUN mvn --show-version --update-snapshots --batch-mode clean package
 FROM openjdk:18-jdk-alpine3.14
 RUN mkdir /app
 WORKDIR /app
-COPY --from=build ./app/api/target/order-api-1.2.2-SNAPSHOT.jar /app
+COPY --from=build ./app/api/target/order-api-1.3.0-SNAPSHOT.jar /app
 EXPOSE 8080
-CMD ["java", "-jar", "order-api-1.2.2-SNAPSHOT.jar"]
+CMD ["java", "-jar", "order-api-1.3.0-SNAPSHOT.jar"]

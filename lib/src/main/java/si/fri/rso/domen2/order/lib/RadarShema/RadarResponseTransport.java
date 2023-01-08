@@ -5,8 +5,8 @@ public class RadarResponseTransport {
     public RadarResponseValue duration;
 
     public RadarResponseTransport() {
-        this.distance = null;
-        this.duration = null;
+        this.distance = new RadarResponseValue();
+        this.duration = new RadarResponseValue();
     }
 
     public RadarResponseTransport(RadarResponseValue distance, RadarResponseValue duration) {

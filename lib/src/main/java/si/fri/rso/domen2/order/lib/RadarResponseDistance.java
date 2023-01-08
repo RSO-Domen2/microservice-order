@@ -8,8 +8,8 @@ public class RadarResponseDistance {
     public RadarResponseRoutes routes;
 
     public RadarResponseDistance() {
-        this.meta = null;
-        this.routes =  null;
+        this.meta = new RadarResponseMeta();
+        this.routes =  new RadarResponseRoutes();
     }
 
     public RadarResponseDistance(RadarResponseMeta meta, RadarResponseRoutes routes) {

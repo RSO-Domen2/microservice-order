@@ -1,5 +1,6 @@
 package si.fri.rso.domen2.order.api.v1.resources;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -41,7 +42,7 @@ import si.fri.rso.domen2.order.services.routing.Optimize;
 @Log
 @ApplicationScoped
 @Tag(name = "Order Metadata", description = "Get, add, and edit the order metadata.")
-@Path("/orders")
+@Path("/order")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class OrderMetadataResource {
@@ -97,12 +98,13 @@ public class OrderMetadataResource {
     }
 
 
-    /* @Operation(description = "Add Order metadata.", summary = "Add metadata")
+    @Operation(description = "Add Order metadata.", summary = "Add metadata")
     @APIResponses({
         @APIResponse(responseCode = "201",
             description = "Metadata successfully added.",
             content = @Content(schema = @Schema(implementation = OrderMetadata.class))),
-        @APIResponse(responseCode = "406", description = "Validation error.")
+        @APIResponse(responseCode = "406", description = "Validation error."),
+        @APIResponse(responseCode = "503", description = "Time out.")
     })
     @POST
     public Response createOrderMetadata(
@@ -112,15 +114,20 @@ public class OrderMetadataResource {
             OrderMetadata om) {
         
         this.LOG.info("POST "+uriInfo.getRequestUri().toString());
+        OrderMetadata updatedOM = opti.calculateBestDeliveryman(om);
+        if(updatedOM == null) {
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Something went wrong.").build();
+        }
+        updatedOM.setCreated(Instant.now());
         om = omb.createOrderMetadata(om);
         if(om == null) {
             return Response.status(Response.Status.NOT_ACCEPTABLE).build();
         }
         return Response.status(Response.Status.CREATED).entity(om).build();
-    } */
+    }
 
     
-    @Operation(description = "Add Order metadata.", summary = "Add metadata")
+    /* @Operation(description = "Add Order metadata.", summary = "Add metadata")
     @APIResponses({
         @APIResponse(responseCode = "201",
             description = "Metadata successfully added.",
@@ -138,19 +145,24 @@ public class OrderMetadataResource {
     ) {
         this.LOG.info("POST ASYNC "+uriInfo.getRequestUri().toString());
         asyncResponse.setTimeoutHandler(unused -> {
-            this.LOG.warning("POST ASYNC "+uriInfo.getRequestUri().toString()+" TIME OUT");
+            this.LOG.warning("POST ASYNC "+uriInfo.getRequestUri().toString()+" TIMED OUT");
             unused.resume(Response.status(Response.Status.SERVICE_UNAVAILABLE).build());
         });
         asyncResponse.setTimeout(30, TimeUnit.SECONDS);
         new Thread(() -> {
             OrderMetadata updatedOM = opti.calculateBestDeliveryman(om);
+            if(updatedOM == null) {
+                asyncResponse.resume(Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("Something went wrong.").build());
+            }
+            this.LOG.info("POST ASYNC found best deliveryman");
+            updatedOM.setCreated(Instant.now());
             updatedOM = omb.createOrderMetadata(updatedOM);
             if(updatedOM == null) {
                 asyncResponse.resume(Response.status(Response.Status.NOT_ACCEPTABLE).build());
             }
             asyncResponse.resume(Response.status(Response.Status.CREATED).entity(om).build());
         }).start();
-    }
+    } */
 
 
     @Operation(description = "Update Order metadata.", summary = "Update metadata")

@@ -4,7 +4,7 @@ public class RadarResponseGeodesic {
     public RadarResponseValue distance;
 
     public RadarResponseGeodesic() {
-        this.distance = null;
+        this.distance = new RadarResponseValue();
     }
 
     public RadarResponseGeodesic(RadarResponseValue distance) {

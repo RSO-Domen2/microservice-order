@@ -39,9 +39,19 @@ public class Optimize {
         RestaurantResponse rr = rc.getRestaurant(om.getRestaurantId());
         MenuResponse mr = rc.getMenu(om.getMenuId());
 
+        if(dr == null || cr == null || rr == null || mr == null) {
+            this.LOG.warning("One of the responses was null");
+            return om;
+        }
+
         double baseCost = mr.price;
 
         RadarResponseDistance baseDistance = radar.getDistance(rr.lat, rr.lng, cr.lat, cr.lng);
+
+        if(baseDistance == null) {
+            this.LOG.warning("Radar baseDistance response was null");
+            return om;
+        }
         
         int bestDeliveryman = 1;
         DeliverymanResponse currentDeliveryman = dr[0];
@@ -67,22 +77,22 @@ public class Optimize {
         double cost = 0.0;
         switch(dm.vehicle) {
             case "car":
-                cost += dm.transportPrice * base.routes.car.distance.value;
-                cost += dm.hourlyPay * base.routes.car.duration.value;
-                cost += dm.transportPrice * ctr.routes.car.distance.value;
-                cost += dm.hourlyPay * ctr.routes.car.duration.value;
+                cost += dm.transportPrice * base.routes.car.distance.value / 1000;
+                cost += dm.hourlyPay * base.routes.car.duration.value / 60;
+                cost += dm.transportPrice * ctr.routes.car.distance.value / 1000;
+                cost += dm.hourlyPay * ctr.routes.car.duration.value / 60;
                 break;
             case "bike":
-                cost += dm.transportPrice * base.routes.bike.distance.value;
-                cost += dm.hourlyPay * base.routes.bike.duration.value;
-                cost += dm.transportPrice * ctr.routes.bike.distance.value;
-                cost += dm.hourlyPay * ctr.routes.bike.duration.value;
+                cost += dm.transportPrice * base.routes.bike.distance.value / 1000;
+                cost += dm.hourlyPay * base.routes.bike.duration.value / 60;
+                cost += dm.transportPrice * ctr.routes.bike.distance.value / 1000;
+                cost += dm.hourlyPay * ctr.routes.bike.duration.value / 60;
                 break;
             default: //foot
-                cost += dm.transportPrice * base.routes.foot.distance.value;
-                cost += dm.hourlyPay * base.routes.foot.duration.value;
-                cost += dm.transportPrice * ctr.routes.foot.distance.value;
-                cost += dm.hourlyPay * ctr.routes.foot.duration.value;
+                cost += dm.transportPrice * base.routes.foot.distance.value / 1000;
+                cost += dm.hourlyPay * base.routes.foot.duration.value / 60;
+                cost += dm.transportPrice * ctr.routes.foot.distance.value / 1000;
+                cost += dm.hourlyPay * ctr.routes.foot.duration.value / 60;
                 break;
         }
         return cost;

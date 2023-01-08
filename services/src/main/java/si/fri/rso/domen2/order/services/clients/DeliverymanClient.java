@@ -32,7 +32,7 @@ public class DeliverymanClient {
             .queryParam("fields", "id,vehicle,hourlyPay,transportPrice,lat,lng")
             .request()
             .get();
-        this.LOG.info("GET "+ap.getRadarUrl()+"/v1/deliveryman "+Integer.toString(response.getStatus()));
+        this.LOG.info("GET "+ap.getDeliverymanUrl()+"/v1/deliveryman "+Integer.toString(response.getStatus()));
         if(response.getStatus() == 200) {
             return response.readEntity(DeliverymanResponse[].class);
         }

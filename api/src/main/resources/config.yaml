@@ -2,7 +2,7 @@ kumuluzee:
   name: order-service
   env:
     name: dev
-  version: 1.1.0
+  version: 1.2.0
   server:
     base-url: http://localhost:8080
     http:
@@ -37,25 +37,25 @@ kumuluzee:
                         </Socket>
                     </Appenders>
                     <Loggers>
-                      <Logger name="si.fri.rso.domen2.order.api.v1.resources.OrderMetadataResource" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.api.v1.resources.OrderMetadataResource" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.api.v1.resources.ExternalTest" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.api.v1.resources.ExternalTest" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.services.beans.OrderMetadataBean" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.services.beans.OrderMetadataBean" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.services.clients.RadarClient" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.services.clients.RadarClient" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.services.clients.DeliverymanClient" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.services.clients.DeliverymanClient" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.services.clients.RestaurantClient" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.services.clients.RestaurantClient" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
-                      <Logger name="si.fri.rso.domen2.order.services.clients.ClientClient" level="trace" additivity="false">
+                      <Logger name="si.fri.rso.domen2.order.services.clients.ClientClient" level="all" additivity="false">
                         <AppenderRef ref="logstash"/>
                       </Logger>
                       <!-- Default logger -->

@@ -48,6 +48,7 @@ public class RadarClient {
     //@Fallback(fallbackMethod = "fallbackGetDistance")
     //@Fallback(RadarDistanceFallback.class)
     public RadarResponseDistance getDistance(Double start_lat, Double start_lng, Double end_lat, Double end_lng) {
+        this.LOG.info(Double.toString(start_lat)+" "+Double.toString(start_lng)+" "+Double.toString(end_lat)+" "+Double.toString(end_lng));
         return this.callRadarDistance(start_lat, start_lng, end_lat, end_lng);
     }
 
@@ -62,9 +63,12 @@ public class RadarClient {
             .get();
         this.LOG.info("GET "+ap.getRadarUrl()+"/v1/route/distance "+Integer.toString(response.getStatus()));
         if(response.getStatus() == 200) {
+            response.bufferEntity();
+            this.LOG.info(response.readEntity(String.class));
             return response.readEntity(RadarResponseDistance.class);
         }
-        return null;
+        this.LOG.warning(response.readEntity(String.class));
+        return fallbackGetDistance(start_lat, start_lng, end_lat, end_lng);
     }
 
     final Double R = 6371000.0;

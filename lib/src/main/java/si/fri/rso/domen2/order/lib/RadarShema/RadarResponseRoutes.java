@@ -7,10 +7,10 @@ public class RadarResponseRoutes {
     public RadarResponseTransport foot;
 
     public RadarResponseRoutes() {
-        this.geodesic = null;
-        this.car = null;
-        this.bike = null;
-        this.foot = null;
+        this.geodesic = new RadarResponseGeodesic();
+        this.car = new RadarResponseTransport();
+        this.bike = new RadarResponseTransport();
+        this.foot = new RadarResponseTransport();
     }
 
     public RadarResponseRoutes(RadarResponseGeodesic geodesic, RadarResponseTransport car, RadarResponseTransport bike, RadarResponseTransport foot) {

@@ -10,11 +10,6 @@ public class ClientResponse {
     public double lat;
     public double lng;
     public Instant created;
-    public String street_number;
-    public String street_name;
-    public int postal_code;
-    public String country;
-    public String city;
     public String username;
     public String password;
 
@@ -25,11 +20,6 @@ public class ClientResponse {
         this.lat = -1.0;
         this.lng = -1.0;
         this.created = null;
-        this.street_number = null;
-        this.street_name = null;
-        this.postal_code = -1;
-        this.country = null;
-        this.city = null;
         this.username = null;
         this.password = null;
     }

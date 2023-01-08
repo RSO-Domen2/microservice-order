@@ -8,6 +8,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,7 +19,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 
+import org.eclipse.microprofile.openapi.annotations.media.Content;
+import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.kumuluz.ee.logs.cdi.Log;
@@ -26,12 +32,14 @@ import com.kumuluz.ee.logs.cdi.Log;
 import si.fri.rso.domen2.order.lib.ClientResponse;
 import si.fri.rso.domen2.order.lib.DeliverymanResponse;
 import si.fri.rso.domen2.order.lib.MenuResponse;
+import si.fri.rso.domen2.order.lib.OrderMetadata;
 import si.fri.rso.domen2.order.lib.RadarResponseDistance;
 import si.fri.rso.domen2.order.lib.RestaurantResponse;
 import si.fri.rso.domen2.order.services.clients.ClientClient;
 import si.fri.rso.domen2.order.services.clients.DeliverymanClient;
 import si.fri.rso.domen2.order.services.clients.RadarClient;
 import si.fri.rso.domen2.order.services.clients.RestaurantClient;
+import si.fri.rso.domen2.order.services.routing.Optimize;
 
 @Log
 @ApplicationScoped
@@ -54,6 +62,9 @@ public class ExternalTest {
 
     @Inject
     private ClientClient cc;
+
+    @Inject
+    private Optimize opti;
 
     @Context
     protected UriInfo uriInfo;
@@ -123,5 +134,23 @@ public class ExternalTest {
         this.LOG.info("GET "+uriInfo.getRequestUri().toString());
         ClientResponse result = cc.getClient(clientId);
         return Response.status(Response.Status.OK).entity(result).build();
+    }
+
+    @POST
+    @Path("/order")
+    @APIResponses({
+        @APIResponse(responseCode = "201",
+            description = "Metadata successfully added.",
+            content = @Content(schema = @Schema(implementation = OrderMetadata.class))),
+        @APIResponse(responseCode = "406", description = "Validation error.")
+    })
+    public OrderMetadata postOrderMetadata(
+        @RequestBody(description = "DTO object with Order metadata.",
+        required = true,
+        content = @Content(schema = @Schema(implementation = OrderMetadata.class)))
+        OrderMetadata om
+    ) {
+        OrderMetadata newOm = opti.calculateBestDeliveryman(om);
+        return newOm;
     }
 }
